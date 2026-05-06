@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CaptionAI — Tự động tạo caption TikTok</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container nav-inner">
+      <a href="#" class="logo">Caption<span>AI</span></a>
+      <div class="nav-links">
+        <a href="#generator">Tạo Caption</a>
+        <a href="#blog">Blog</a>
+        <button id="authBtn" class="btn-auth">Đăng nhập</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-badge">✨ Powered by Claude AI</div>
+      <h1>Tự động viết lại caption<br><span class="gradient-text">TikTok chỉ trong 3 giây</span></h1>
+      <p>Dán link video TikTok — nhận ngay caption hấp dẫn, CTA chuyển đổi cao và hashtag chuẩn xu hướng.</p>
+      <a href="#generator" class="btn-primary hero-cta">Thử ngay miễn phí →</a>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num">1 Caption</span><span>Hấp dẫn</span></div>
+        <div class="stat"><span class="stat-num">1 CTA</span><span>Chuyển đổi cao</span></div>
+        <div class="stat"><span class="stat-num">6-8 Tags</span><span>Chuẩn xu hướng</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Generator -->
+  <section id="generator" class="section">
+    <div class="container">
+      <h2>Tạo Caption Ngay</h2>
+      <p class="section-sub">Dán link video TikTok vào ô dưới đây và nhấn tạo</p>
+
+      <div class="card generator-card">
+        <div class="input-row">
+          <input type="url" id="urlInput"
+            placeholder="https://www.tiktok.com/@user/video/123..."
+            class="url-input" autocomplete="off">
+          <button id="generateBtn" class="btn-primary">
+            <span id="btnText">Tạo Caption</span>
+            <span id="btnLoad" class="hidden">⏳ Đang xử lý...</span>
+          </button>
+        </div>
+        <p class="hint">Hỗ trợ: tiktok.com/@user/video/... hoặc vm.tiktok.com/...</p>
+
+        <div id="errorBox" class="alert alert-error hidden"></div>
+
+        <div id="resultBox" class="result-grid hidden">
+          <div class="result-card">
+            <div class="result-head">
+              <span>✍️</span><h3>Caption</h3>
+              <button class="copy-btn" data-for="captionOut">Sao chép</button>
+            </div>
+            <p id="captionOut" class="result-body"></p>
+          </div>
+          <div class="result-card">
+            <div class="result-head">
+              <span>📣</span><h3>Call to Action</h3>
+              <button class="copy-btn" data-for="ctaOut">Sao chép</button>
+            </div>
+            <p id="ctaOut" class="result-body"></p>
+          </div>
+          <div class="result-card full-col">
+            <div class="result-head">
+              <span>🏷️</span><h3>Hashtags</h3>
+              <button class="copy-btn" id="copyAllTags">Sao chép tất cả</button>
+            </div>
+            <div id="tagsOut" class="tags-row"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- History -->
+      <div class="history-wrap">
+        <h3 class="history-title">Lịch sử gần đây</h3>
+        <div id="historyList" class="history-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Blog -->
+  <section id="blog" class="section section-alt">
+    <div class="container">
+      <div class="section-row">
+        <div>
+          <h2>Blog</h2>
+          <p class="section-sub">Kiến thức về content marketing & TikTok</p>
+        </div>
+        <button id="newPostBtn" class="btn-outline">+ Viết bài mới</button>
+      </div>
+      <div id="blogGrid" class="blog-grid">
+        <div class="empty-state">Đang tải bài viết...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p class="logo">Caption<span>AI</span></p>
+      <p class="footer-sub">Node.js · Express · SQLite · Claude AI · Docker</p>
+      <p class="footer-sub">© 2025 — Demo Project</p>
+    </div>
+  </footer>
+
+  <!-- Modal: Auth -->
+  <div id="authModal" class="modal hidden">
+    <div class="overlay" id="authOverlay"></div>
+    <div class="modal-box">
+      <button class="modal-x" id="closeAuth">×</button>
+
+      <div id="formLogin">
+        <h3>Đăng nhập</h3>
+        <input type="text" id="lUser" placeholder="Tên đăng nhập" class="field">
+        <input type="password" id="lPass" placeholder="Mật khẩu" class="field">
+        <button id="doLogin" class="btn-primary full">Đăng nhập</button>
+        <p class="switch-text">Chưa có tài khoản? <a href="#" id="goRegister">Đăng ký</a></p>
+        <div id="loginErr" class="alert alert-error hidden"></div>
+      </div>
+
+      <div id="formRegister" class="hidden">
+        <h3>Đăng ký</h3>
+        <input type="text" id="rUser" placeholder="Tên đăng nhập (3-30 ký tự)" class="field">
+        <input type="password" id="rPass" placeholder="Mật khẩu (tối thiểu 6 ký tự)" class="field">
+        <button id="doRegister" class="btn-primary full">Tạo tài khoản</button>
+        <p class="switch-text">Đã có tài khoản? <a href="#" id="goLogin">Đăng nhập</a></p>
+        <div id="registerErr" class="alert alert-error hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Write Post -->
+  <div id="postModal" class="modal hidden">
+    <div class="overlay" id="postOverlay"></div>
+    <div class="modal-box modal-lg">
+      <button class="modal-x" id="closePost">×</button>
+      <h3 id="postModalLabel">Viết bài mới</h3>
+      <input type="hidden" id="editId">
+      <input type="text" id="postTitle" placeholder="Tiêu đề bài viết..." class="field">
+      <textarea id="postContent" placeholder="Nội dung bài viết..." class="textarea" rows="12"></textarea>
+      <div class="modal-footer">
+        <button id="cancelPost" class="btn-outline">Hủy</button>
+        <button id="submitPost" class="btn-primary">Đăng bài</button>
+      </div>
+      <div id="postErr" class="alert alert-error hidden"></div>
+    </div>
+  </div>
+
+  <!-- Modal: View Post -->
+  <div id="viewModal" class="modal hidden">
+    <div class="overlay" id="viewOverlay"></div>
+    <div class="modal-box modal-lg">
+      <button class="modal-x" id="closeView">×</button>
+      <h2 id="viewTitle"></h2>
+      <p id="viewMeta" class="post-meta"></p>
+      <div id="viewBody" class="post-body"></div>
+      <div id="viewActions" class="view-actions hidden">
+        <button id="editBtn" class="btn-outline">Chỉnh sửa</button>
+        <button id="deleteBtn" class="btn-danger">Xóa bài</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
