@@ -53,6 +53,9 @@ app.use((err, req, res, _next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-initDB()
-  .then(() => app.listen(PORT, () => console.log(`Server running → http://localhost:${PORT}`)))
-  .catch(err => { console.error('DB init failed:', err.message); process.exit(1); });
+app.listen(PORT, () => {
+  console.log(`Server running → http://localhost:${PORT}`);
+  initDB()
+    .then(() => console.log('Database ready'))
+    .catch(err => { console.error('DB init failed:', err.message); process.exit(1); });
+});
