@@ -59,5 +59,8 @@ app.listen(PORT, () => {
   console.log(`Server running → http://localhost:${PORT}`);
   initDB()
     .then(() => console.log('Database ready'))
-    .catch(err => { console.error('DB init failed:', err.message, '| code:', err.code, '| detail:', err.detail); process.exit(1); });
+    .catch(err => {
+      console.error('DB FATAL:', err.message, 'code:', err.code);
+      process.exit(1);
+    });
 });

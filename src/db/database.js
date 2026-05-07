@@ -3,7 +3,7 @@ const { Pool } = require('pg');
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
-  connectionTimeoutMillis: 20000,
+  connectionTimeoutMillis: 30000,
   idleTimeoutMillis: 30000
 });
 
@@ -12,7 +12,21 @@ async function query(sql, params = []) {
   return rows;
 }
 
-async function initDB() {
+async function initDB(retries = 5, delay = 3000) {
+  try {
+    await _createTables();
+    console.log('Database initialized');
+  } catch (err) {
+    if (retries > 0) {
+      console.log(`DB connect failed (${err.message}), retrying in ${delay}ms... (${retries} left)`);
+      await new Promise(r => setTimeout(r, delay));
+      return initDB(retries - 1, delay * 1.5);
+    }
+    throw err;
+  }
+}
+
+async function _createTables() {
   await query(`
     CREATE TABLE IF NOT EXISTS users (
       id       SERIAL PRIMARY KEY,
@@ -44,7 +58,6 @@ async function initDB() {
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
-  console.log('Database initialized');
 }
 
 /* ── users ──────────────────────────────────────────── */
